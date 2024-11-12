@@ -27,10 +27,14 @@ export default function Home() {
      "https://almondzglobal.com/",
      "https://www.itekvisioncentre.com/","https://www.acrokx.com/"];
 
+
+     const [firstName, ...lastName] = vCardData.name.split(" ");
+     const lastNameStr = lastName.join(" ");
   const generateVCardText = () => {
     return `BEGIN:VCARD
 VERSION:3.0
 FN:${vCardData.name}
+N:${lastNameStr};${firstName};;;
 ORG:${vCardData.organization}
 TITLE:${vCardData.designation}
 TEL:+91${vCardData.phoneNumber}
