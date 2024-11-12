@@ -1,5 +1,5 @@
 'use client'
-import { useState, useRef } from 'react';
+import { useState, useRef,useEffect } from 'react';
 import QRCode from 'react-qr-code';
 import html2canvas from 'html2canvas';
 
@@ -16,6 +16,7 @@ export default function Home() {
   });
   const [qrCode, setQrCode] = useState(null);
   const qrCodeRef = useRef();
+  const qrCodeSectionRef = useRef(null);
 
   const organizations = ["Almondz Global Securities limited",
      "ALMONDZ FINANCIAL SERVICES LTD",
@@ -60,11 +61,15 @@ END:VCARD`;
     });
   };
 
+  useEffect(() => {
+    if (qrCode && qrCodeSectionRef.current) {
+      qrCodeSectionRef.current.scrollIntoView({ behavior: 'smooth' });
+    }
+  }, [qrCode]);
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-r from-blue-300 to-purple-300 text-white">
       <h1 className="text-3xl font-bold mb-6">Almondz QR Code Generator</h1>
       <div className="w-full max-w-lg bg-white text-gray-900 p-6 rounded-lg shadow-lg">
-        
         <form className="space-y-4">
           {['name', 'designation'].map((field) => (
             <div key={field}>
@@ -80,7 +85,6 @@ END:VCARD`;
               />
             </div>
           ))}
-
           <div>
             <label className="block text-gray-700 font-semibold mb-1">Email</label>
             <div className="flex items-center">
@@ -177,7 +181,7 @@ END:VCARD`;
       </div>
 
       {qrCode && (
-        <div className="mt-8 flex flex-col items-center">
+        <div ref={qrCodeSectionRef} className="mt-8 flex flex-col items-center">
           <div ref={qrCodeRef} className="bg-white p-4 rounded-lg shadow-lg">
             <QRCode value={qrCode} size={150} level="M" />
           </div>
