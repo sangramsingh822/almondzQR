@@ -17,8 +17,10 @@ export default function Home() {
   const [qrCode, setQrCode] = useState(null);
   const qrCodeRef = useRef();
   const qrCodeSectionRef = useRef(null);
+  const qrCodeRefWebsite = useRef();
+  const [qrCodeWebsite, setQrCodeWebsite] = useState(null);
 
-  const organizations = ["Almondz Global Securities limited",
+  const organizations = ["Almondz Global Securities Limited",
      "ALMONDZ FINANCIAL SERVICES LTD",
       "Almondz Global Infra Consultant Limited","Acrokx Realty Private Limited"];
   const websites = [
@@ -39,7 +41,6 @@ N:${lastNameStr};${firstName};;;
 ORG:${vCardData.organization}
 TITLE:${vCardData.designation}
 TEL:+91${vCardData.phoneNumber}
-TEL:+91${vCardData.additionalPhoneNumber}
 EMAIL:${vCardData.emailPrefix}@almondz.com
 ADR:${vCardData.address}
 URL:${vCardData.website}
@@ -49,13 +50,15 @@ END:VCARD`;
   const generateQRCode = () => {
     const vCardText = generateVCardText();
     setQrCode(vCardText);
+    setQrCodeWebsite(vCardData.website.trim());
   };
 
-  const downloadQRCodeAsPNG = () => {
-    html2canvas(qrCodeRef.current, { backgroundColor: null, scale: 4 }).then((canvas) => {
+  const downloadQRCodeAsPNG = (type) => {
+    const qrCodeRefs = type === 'vcard' ? qrCodeRef : qrCodeRefWebsite;
+    html2canvas(qrCodeRefs.current, { backgroundColor: null, scale: 2 }).then((canvas) => {
       const link = document.createElement('a');
       link.href = canvas.toDataURL('image/png');
-      const fileName = vCardData.name ? `${vCardData.name}-qr.png` : 'vcard-qr-code.png';
+      const fileName = type === 'vcard' ? `${vCardData.name}-qr.png` : `${vCardData.website.match(/https?:\/\/(?:www\.)?([^\/]+)/)[1].split('.')[0]}-qr.png`;
       link.download = fileName;
       link.click();
     });
@@ -180,19 +183,34 @@ END:VCARD`;
         </form>
       </div>
 
-      {qrCode && (
-        <div ref={qrCodeSectionRef} className="mt-8 flex flex-col items-center">
-          <div ref={qrCodeRef} className="bg-white p-4 rounded-lg shadow-lg">
-            <QRCode value={qrCode} size={150} level="M" />
-          </div>
-          <button
-            onClick={downloadQRCodeAsPNG}
-            className="mt-4 bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded-lg transition duration-300"
-          >
-            Download QR Code as PNG
-          </button>
-        </div>
-      )}
+     {qrCode && (
+  <div ref={qrCodeSectionRef} className="mt-8 flex flex-col items-center">
+    {/* First QR Code */}
+    <div ref={qrCodeRef} className="bg-white p-4 rounded-lg shadow-lg mb-4">
+      <QRCode value={qrCode} size={150} level="M" />
+    </div>
+    <button
+     onClick={() => downloadQRCodeAsPNG('vcard')}
+      className="mt-4 bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded-lg transition duration-300"
+    >
+      Download QR Code as PNG
+    </button>
+
+    {/* Second QR Code */}
+    <div ref={ qrCodeRefWebsite} className="bg-white p-4 rounded-lg shadow-lg mt-8">
+      <QRCode value={qrCodeWebsite} size={150} level="M" />
+    </div>
+    <button
+      onClick={() => downloadQRCodeAsPNG('website')}
+      className="mt-4 bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded-lg transition duration-300"
+    >
+      Download Website QR Code as PNG
+    </button>
+  </div>
+)}
+
+
+   
     </div>
   );
 }
